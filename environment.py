@@ -45,7 +45,7 @@ class QTable:
         max_future_q = np.max(self.table[new_state])
         current_q_index = current_state + (action, )
         current_q = self.table[current_q_index]
-        new_q = 1 - self.LEARNING_RATE * current_q + self.LEARNING_RATE * (reward + self.DISCOUNT_FACTOR * max_future_q)
+        new_q = (1 - self.LEARNING_RATE) * current_q + self.LEARNING_RATE * (reward + self.DISCOUNT_FACTOR * max_future_q)
         self.table[current_q_index] = new_q
 
     def mark_state_as_win(self, state, action):
@@ -81,6 +81,7 @@ class Environment:
                 if DEBUG: print("Won on iteration", iteration)
                 self.qTable.mark_state_as_win(current_discrete_state, action)
                 break
+            current_discrete_state = new_discrete_state
     
     def close(self):
         if DEBUG: print("------ Done ------")
@@ -92,7 +93,7 @@ class Environment:
 env = Environment(config["environment"]["name"])
 if DEBUG : env.describe_environment()
 for episode in range(config["run"]["episodes"]):
-    if DEBUG : print(f"------ Starting Episode {episode}------")
+    if DEBUG and episode % config["run"]["aliveEvery"]  == 0 : print(f"------ Starting Episode {episode}------")
     if config["run"]["render"]:
         env.set_render(episode % config["run"]["renderEvery"] == 0)
     env.run_episode()

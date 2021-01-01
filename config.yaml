@@ -1,14 +1,15 @@
 qTable:
   numberOfBuckets: 20
-  learningRate: 0.5
-  discountFactor: 0.5
+  learningRate: 0.1
+  discountFactor: 0.95
 
 environment:
   name: 'MountainCar-v0'
-  iterations: 2000
+  iterations: 200
 
 run:
-  episodes: 1
+  episodes: 501
   debug: true
   render: true
-  renderEvery: 5
+  renderEvery: 100
+  aliveEvery: 20
