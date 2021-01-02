@@ -4,13 +4,13 @@ qTable:
   discountFactor: 0.95
 
 environment:
-  name: 'MountainCar-v0'
-  iterations: 200
+  name: 'Breakout-ram-v0'
+  iterations: 1000
 
 run:
   epsilon: 0.1
-  episodes: 1001
+  episodes: 1
   debug: true
   render: true
-  renderEvery: 100
-  aliveEvery: 20
+  renderEvery: 1
+  aliveEvery: 1

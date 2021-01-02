@@ -26,7 +26,7 @@ class QTable:
         print("------ QTable ------")
         print("Bucket space description", self.buckets)
         print("Bucket sizes", self.bucket_sizes)
-        print("Table info", self.table.shape)
+        # print("Table info", self.table.shape)
 
     def get_discrete(self, state):
         discrete = (state - self.low) / self.bucket_sizes
