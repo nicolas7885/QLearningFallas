@@ -19,7 +19,7 @@ class QTable:
         self.buckets = [self.NUMBER_OF_BUCKETS] * len(self.high)
         self.bucket_sizes = (self.high - self.low) / self.buckets
         # Initialize table with randoms for each bucket and action
-         # Low and high depends on rewards, for mountain its -1 if fail, 0 if success
+        # Low and high depends on rewards, for mountain its -1 if fail, 0 if success
         self.table = np.random.uniform(low=-2, high=0, size=(self.buckets + [environment.action_space.n]))
     
     def describe_table(self):
@@ -32,8 +32,11 @@ class QTable:
         discrete = (state - self.low) / self.bucket_sizes
         return tuple(discrete.astype(np.int))
 
-    def get_best_action(self, current_state):
-        return np.argmax(self.table[current_state])
+    def get_best_action(self, current_state, epsilon):
+        if np.random.rand() > epsilon :
+            return np.argmax(self.table[current_state])
+        else:
+            return np.random.randint(0, len(self.table[current_state]))
 
     def update_q(self, current_state, action, new_state, reward):
         max_future_q = np.max(self.table[new_state])
@@ -44,3 +47,6 @@ class QTable:
 
     def mark_state_as_win(self, state, action):
         self.table[state + (action, )] = 0
+
+    def new_epsilon(self, epsilon):
+        self.EPSILON = epsilon

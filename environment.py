@@ -5,7 +5,6 @@ config = yaml.safe_load(open("config.yaml"))
 # TODO: use logger with log level
 # TODO avoid needing this debug here?
 DEBUG = config["run"]["debug"]
-
 class Environment:
     def __init__(self, environmentName, iterations_per_episode):
         self.env = gym.make(environmentName)
@@ -23,11 +22,11 @@ class Environment:
         print("Observation space Low", self.env.observation_space.low)
         print("Goal", self.env.goal_position)
 
-    def run_episode(self):
+    def run_episode(self, epsilon):
         current_discrete_state = self.qTable.get_discrete(self.env.reset())
         for iteration in range(self.iterations_in_episode):
             if self.render : self.env.render()
-            action = self.qTable.get_best_action(current_discrete_state)
+            action = self.qTable.get_best_action(current_discrete_state, epsilon)
             new_state, reward, done, _ = self.env.step(action)
             new_discrete_state = self.qTable.get_discrete(new_state)
             if not done: 
@@ -37,7 +36,7 @@ class Environment:
                 self.qTable.mark_state_as_win(current_discrete_state, action)
                 break
             current_discrete_state = new_discrete_state
-    
+
     def close(self):
         if DEBUG: print("------ Done ------")
         self.env.close()

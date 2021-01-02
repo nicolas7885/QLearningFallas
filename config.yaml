@@ -8,6 +8,7 @@ environment:
   iterations: 200
 
 run:
+  epsilon: 0.1
   episodes: 1001
   debug: true
   render: true
