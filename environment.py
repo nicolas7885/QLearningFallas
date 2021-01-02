@@ -1,62 +1,17 @@
 import gym
-import numpy as np
+from qTable import QTable
 import yaml
 config = yaml.safe_load(open("config.yaml"))
 # TODO: use logger with log level
+# TODO avoid needing this debug here?
 DEBUG = config["run"]["debug"]
-RENDER = config["run"]["render"]
-
-# TODO: separate in files per classes
-
-# A table of discrete buckets for each observation vector and action, which holds the expected reward fot taking
-# such action coming from that observation combination.
-# Discrete process is necessary to turn continous environment into a manageable one
-class QTable:
-    NUMBER_OF_BUCKETS = config["qTable"]["numberOfBuckets"]
-    # How much of new info overrides old. priorize old -> `0 <= x <= 1` -> priorize new
-    LEARNING_RATE = config["qTable"]["learningRate"]
-    # How much we look to the future. immediate reward -> `0 <= x < 1` -> future rewards.
-    DISCOUNT_FACTOR = config["qTable"]["discountFactor"]
-
-    def __init__(self, environment):
-        self.low = environment.observation_space.low
-        self.high = environment.observation_space.high
-        self.buckets = [self.NUMBER_OF_BUCKETS] * len(self.high)
-        self.bucket_sizes = (self.high - self.low) / self.buckets
-        # Initialize table with randoms for each bucket and action
-         # Low and high depends on rewards, for mountain its -1 if fail, 0 if success
-        self.table = np.random.uniform(low=-2, high=0, size=(self.buckets + [environment.action_space.n]))
-        if DEBUG: self.describe_table()
-    
-    def describe_table(self):
-        print("------ QTable ------")
-        print("Bucket space description", self.buckets)
-        print("Bucket sizes", self.bucket_sizes)
-        print("Table info", self.table.shape)
-
-    def get_discrete(self, state):
-        discrete = (state - self.low) / self.bucket_sizes
-        return tuple(discrete.astype(np.int))
-
-    def get_best_action(self, current_state):
-        return np.argmax(self.table[current_state])
-
-    def update_q(self, current_state, action, new_state, reward):
-        max_future_q = np.max(self.table[new_state])
-        current_q_index = current_state + (action, )
-        current_q = self.table[current_q_index]
-        new_q = (1 - self.LEARNING_RATE) * current_q + self.LEARNING_RATE * (reward + self.DISCOUNT_FACTOR * max_future_q)
-        self.table[current_q_index] = new_q
-
-    def mark_state_as_win(self, state, action):
-        self.table[state + (action, )] = 0
-
 
 class Environment:
-    ITERATIONS_IN_EPISODE = config["environment"]["iterations"]
-    def __init__(self, environmentName):
+    def __init__(self, environmentName, iterations_per_episode):
         self.env = gym.make(environmentName)
+        self.iterations_in_episode = iterations_per_episode
         self.qTable = QTable(self.env)
+        if DEBUG: self.qTable.describe_table()
         self.render = False
 
     def describe_environment(self):
@@ -70,7 +25,7 @@ class Environment:
 
     def run_episode(self):
         current_discrete_state = self.qTable.get_discrete(self.env.reset())
-        for iteration in range(self.ITERATIONS_IN_EPISODE):
+        for iteration in range(self.iterations_in_episode):
             if self.render : self.env.render()
             action = self.qTable.get_best_action(current_discrete_state)
             new_state, reward, done, _ = self.env.step(action)
@@ -89,12 +44,3 @@ class Environment:
 
     def set_render(self, shouldRender):
         self.render = shouldRender
-
-env = Environment(config["environment"]["name"])
-if DEBUG : env.describe_environment()
-for episode in range(config["run"]["episodes"]):
-    if DEBUG and episode % config["run"]["aliveEvery"]  == 0 : print(f"------ Starting Episode {episode}------")
-    if config["run"]["render"]:
-        env.set_render(episode % config["run"]["renderEvery"] == 0)
-    env.run_episode()
-env.close()
