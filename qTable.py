@@ -13,20 +13,19 @@ class QTable:
     # How much we look to the future. immediate reward -> `0 <= x < 1` -> future rewards.
     DISCOUNT_FACTOR = config["discountFactor"]
 
-    def __init__(self, environment):
-        self.low = environment.observation_space.low
-        self.high = environment.observation_space.high
+    def __init__(self, low, high, number_of_actions):
+        self.low = np.array(low)
+        self.high = np.array(high)
         self.buckets = [self.NUMBER_OF_BUCKETS] * len(self.high)
         self.bucket_sizes = (self.high - self.low) / self.buckets
         # Initialize table with randoms for each bucket and action
-        # Low and high depends on rewards, for mountain its -1 if fail, 0 if success
-        self.table = np.random.uniform(low=-2, high=0, size=(self.buckets + [environment.action_space.n]))
+        self.table = np.random.uniform(low=0, high=10, size=(self.buckets + [number_of_actions]))
     
     def describe_table(self):
         print("------ QTable ------")
         print("Bucket space description", self.buckets)
         print("Bucket sizes", self.bucket_sizes)
-        # print("Table info", self.table.shape)
+        print("Table info", self.table.shape)
 
     def get_discrete(self, state):
         discrete = (state - self.low) / self.bucket_sizes
@@ -44,9 +43,6 @@ class QTable:
         current_q = self.table[current_q_index]
         new_q = (1 - self.LEARNING_RATE) * current_q + self.LEARNING_RATE * (reward + self.DISCOUNT_FACTOR * max_future_q)
         self.table[current_q_index] = new_q
-
-    def mark_state_as_win(self, state, action):
-        self.table[state + (action, )] = 0
 
     def new_epsilon(self, epsilon):
         self.EPSILON = epsilon

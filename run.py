@@ -11,7 +11,7 @@ EPSILON_DECAY_START = 1
 EPSILON_DECAY_END = EPISODES // 2
 EPSILON_DECAY_VALUE = epsilon / (EPSILON_DECAY_END - EPSILON_DECAY_START)
 
-env = Environment(config["environment"]["name"], config["environment"]["iterations"])
+env = Environment(config["environment"]["name"])
 if DEBUG : env.describe_environment()
 for episode in range(EPISODES):
     if DEBUG and episode % config["run"]["aliveEvery"]  == 0 :

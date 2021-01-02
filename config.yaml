@@ -1,16 +1,16 @@
 qTable:
-  numberOfBuckets: 20
+  numberOfBuckets: 50
   learningRate: 0.1
   discountFactor: 0.95
 
 environment:
   name: 'Breakout-ram-v0'
-  iterations: 1000
+  renderDelay: 0.001
 
 run:
-  epsilon: 0.1
-  episodes: 1
+  epsilon: 0.5
+  episodes: 1001
   debug: true
   render: true
-  renderEvery: 1
-  aliveEvery: 1
+  renderEvery: 100
+  aliveEvery: 20
