@@ -19,7 +19,7 @@ class QTable:
         self.buckets = [self.NUMBER_OF_BUCKETS] * len(self.high)
         self.bucket_sizes = (self.high - self.low) / self.buckets
         # Initialize table with randoms for each bucket and action
-        self.table = np.random.uniform(low=0, high=10, size=(self.buckets + [number_of_actions]))
+        self.table = np.random.uniform(low=config["startLow"], high=config["startHigh"], size=(self.buckets + [number_of_actions]))
     
     def describe_table(self):
         print("------ QTable ------")

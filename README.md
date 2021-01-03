@@ -37,4 +37,8 @@ El byte 57 son las vidas.
 Usando accion de movimiento random, determinamos que los bytes 70 (184 pared izq, 0 pared derecha) y 72 (55 pared izq y 191 pared derecha) son de la posicion de la plataforma.
 Ya teniamos la posicion de la bola, la plataforma, las vidas, solo nos falta el puntuaje. Al hacer un punto el byte 77 aumenta en uno y el 84 en 5
 
-Ahora era necesario adaptar el sistema
+Ahora era necesario adaptar el sistema.
+
+Primero se intento de reward el puntaje del juego. El problema fue que si lograba hacer un punto en la primer vida, luego esto recompensaria NO jugar una vez se tenia unos pocos puntos, cosa que ocurrio. Por esto se le agrego penalizacion por la pelota estar perdida, y recompensa por estar cerca de la bola. Pero esto no era suficiente (no aprendia), por lo que seguimos probando con distintos valores de buckets, epsilon, factor de afrendizaje y descuento.
+
+Como no venia aprendiendo, se probo nada mas penalizar la caida de la bola, para ver si aprendia a sobrevivir.
