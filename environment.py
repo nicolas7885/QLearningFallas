@@ -62,5 +62,8 @@ class Environment:
         if DEBUG: print("------ Done ------")
         self.env.close()
 
+    def get_qTable():
+        return self.qTable.table
+
     def set_render(self, shouldRender):
         self.render = shouldRender

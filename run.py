@@ -2,6 +2,8 @@ import gym
 from environment import Environment
 import matplotlib.pyplot as plotter
 import yaml
+import numpy as np
+
 config = yaml.safe_load(open("config.yaml"))
 # TODO: use logger with log level
 DEBUG = config["run"]["debug"]
@@ -15,6 +17,8 @@ EPSILON_DECAY_VALUE = epsilon / (EPSILON_DECAY_END - EPSILON_DECAY_START)
 
 rewards = []
 aggregates = {'ep': [], 'avg': [], 'min': [], 'max': []}
+
+
 
 env = Environment(config["environment"]["name"])
 if DEBUG : env.describe_environment()
@@ -34,11 +38,16 @@ for episode in range(EPISODES):
         aggregates['avg'].append(average)
         aggregates['min'].append(min(last_section))
         aggregates['max'].append(max(last_section))
+        plotter.plot(aggregates['ep'], aggregates['avg'], Label='avg', color = 'b')
+        plotter.plot(aggregates['ep'], aggregates['min'], Label='min', color = 'g')
+        plotter.plot(aggregates['ep'], aggregates['max'], Label='max', color = 'r')
+        handles, labels = plotter.gca().get_legend_handles_labels()
+        by_label = dict(zip(labels, handles))
+        plotter.legend(by_label.values(), by_label.keys())
+        plotter.savefig('plot.png')
+        np.save(f"qtables/{episode}-qtable.npy", env.get_qTable)
 
 env.close()
 
-plotter.plot(aggregates['ep'], aggregates['avg'], Label='avg')
-plotter.plot(aggregates['ep'], aggregates['min'], Label='min')
-plotter.plot(aggregates['ep'], aggregates['max'], Label='max')
-plotter.legend(loc=4)
+
 plotter.show()
