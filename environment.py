@@ -22,6 +22,10 @@ class Environment:
         if DEBUG: self.qTable.describe_table()
         self.render = False
 
+    def load_table(self, table):
+        self.qTable.load_table(table)
+    
+
     def get_position_bytes(self, state):
         return [state[72], state[99], state[self.BALL_Y_POSITION_BYTE]]
 
@@ -58,11 +62,26 @@ class Environment:
             current_discrete_state = new_discrete_state
         return self.get_score(new_state)
 
+    def run_episode_without_learning(self):
+        current_discrete_state = self.qTable.get_discrete(self.get_position_bytes(self.env.reset()))
+        done = False
+        # Force start game to avoid learning to NOT play
+        self.env.step(1)
+        while not done:
+            self.env.render()
+            time.sleep(RENDER_DELAY)
+            action = self.qTable.get_best_action_without_random(current_discrete_state)
+            new_state, hit, done, _ = self.env.step(action)
+            new_discrete_state = self.qTable.get_discrete(self.get_position_bytes(new_state))
+            reward = self.get_reward(new_state)
+            current_discrete_state = new_discrete_state
+        return self.get_score(new_state)
+
     def close(self):
         if DEBUG: print("------ Done ------")
         self.env.close()
 
-    def get_qTable():
+    def get_qTable(self):
         return self.qTable.table
 
     def set_render(self, shouldRender):

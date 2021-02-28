@@ -6,22 +6,16 @@ import numpy as np
 
 config = yaml.safe_load(open("config.yaml"))
 # TODO: use logger with log level
-DEBUG = config["run"]["debug"]
-RENDER = config["run"]["render"]
-EPISODES = config["run"]["episodes"]
-ALIVE_EVERY = config["run"]["aliveEvery"]
-epsilon = config["run"]["epsilon"]
-EPSILON_DECAY_START = 1
-EPSILON_DECAY_END = EPISODES // 2
-EPSILON_DECAY_VALUE = epsilon / (EPSILON_DECAY_END - EPSILON_DECAY_START)
-
-rewards = []
-aggregates = {'ep': [], 'avg': [], 'min': [], 'max': []}
 
 
 
 env = Environment(config["environment"]["name"])
-if DEBUG : env.describe_environment()
+table = np.load("qtables/100000-qtable.npy", allow_pickle=True )
+print(table)
+env.load_table(table)
+env.run_episode_without_learning()
+
+'''
 for episode in range(EPISODES):
     if DEBUG and not episode % ALIVE_EVERY :
         print(f"------ Starting Episode {episode}------")
@@ -45,9 +39,8 @@ for episode in range(EPISODES):
         by_label = dict(zip(labels, handles))
         plotter.legend(by_label.values(), by_label.keys())
         plotter.savefig('plot.png')
-        np.save(f"qtables/{episode}-qtable.npy", env.get_qTable())
+        np.save(f"qtables/{episode}-qtable.npy", env.get_qTable)
 
 env.close()
-
-
 plotter.show()
+'''

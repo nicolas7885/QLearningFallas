@@ -20,7 +20,11 @@ class QTable:
         self.bucket_sizes = (self.high - self.low) / self.buckets
         # Initialize table with randoms for each bucket and action
         self.table = np.random.uniform(low=config["startLow"], high=config["startHigh"], size=(self.buckets + [number_of_actions]))
-    
+
+
+    def load_table(self, table):
+        self.table = table
+
     def describe_table(self):
         print("------ QTable ------")
         print("Bucket space description", self.buckets)
@@ -36,6 +40,10 @@ class QTable:
             return np.argmax(self.table[current_state])
         else:
             return np.random.randint(0, len(self.table[current_state]))
+
+    def get_best_action_without_random(self, current_state):
+        return np.argmax(self.table[current_state])
+    
 
     def update_q(self, current_state, action, new_state, reward):
         max_future_q = np.max(self.table[new_state])
